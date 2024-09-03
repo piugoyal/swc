@@ -1,0 +1,25 @@
+kind: SylvaWorkloadCluster
+apiVersion: workloadclusteroperator.sylva/v1alpha1
+metadata:
+  name: swc1
+  namespace: wc-1
+spec:
+  k8sVersion: "1.28"  # without minor
+  # which parts of sylva-units `.cluster`
+  infrastructure: openstack # metal3, vsphere
+  controlPlane:
+    provider: rke2 # kubeadm
+    replicas: 1
+  machineDeployments:  # mapped to sylva-units .cluster.machine_deployments
+    # but not everything is allowed
+    # in particular, no `{{.*}}` string is allowed
+    my-md1-name:
+      replicas: 1
+  enabledUnits:   # shortcut to have something lighter than sylvaUnitsValues.units.xxx.enabled
+    multus: true # false
+  clusterSettings:
+    capo:
+      ssh_key_name: mgmt_key
+      image_key: ubuntu-jammy-hardened-rke2-1-28-12
+      network_id: 489b1587-4aa4-49b2-be56-62af67efa68f
+      flavor_name: "B1.xlarge"
