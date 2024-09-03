@@ -11,7 +11,7 @@ spec:
     replicas: 1
   machineDeployments:
     my-md1-name:
-      replicas: 2
+      replicas: 1
   enabledUnits:
     multus: true
   clusterSettings:
