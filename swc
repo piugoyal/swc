@@ -4,19 +4,16 @@ metadata:
   name: swc
   namespace: wc-1
 spec:
-  k8sVersion: "1.28"  # without minor
-  # which parts of sylva-units `.cluster`
-  infrastructure: openstack # metal3, vsphere
+  k8sVersion: "1.28"
+  infrastructure: openstack
   controlPlane:
-    provider: rke2 # kubeadm
+    provider: rke2
     replicas: 1
-  machineDeployments:  # mapped to sylva-units .cluster.machine_deployments
-    # but not everything is allowed
-    # in particular, no `{{.*}}` string is allowed
+  machineDeployments:
     my-md1-name:
       replicas: 1
-  enabledUnits:   # shortcut to have something lighter than sylvaUnitsValues.units.xxx.enabled
-    multus: true # false
+  enabledUnits:
+    multus: true
   clusterSettings:
     capo:
       ssh_key_name: mgmt_key
