@@ -2,7 +2,7 @@ kind: SylvaWorkloadCluster
 apiVersion: workloadclusteroperator.sylva/v1alpha1
 metadata:
   name: swc
-  namespace: wc-1
+  namespace: test-wc
 spec:
   k8sVersion: "1.28"
   infrastructure: openstack
