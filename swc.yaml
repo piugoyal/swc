@@ -22,13 +22,13 @@ metadata:
   name: wc1
   namespace: swct-teama
 spec:
-  k8sVersion: "1.33"
+  k8sVersion: "1.34"
   sylvaSourceVersion:
     branch: main
   infrastructure: openstack
   controlPlane:
-    provider: rke2
-    replicas: 3
+    provider: kubeadm
+    replicas: 1
   machineDeployments:
     md1:
       replicas: 0
