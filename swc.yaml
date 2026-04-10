@@ -8,7 +8,7 @@ spec:
   - secretKey: secrets
     remoteRef:
       key: common/capo
-      property: secrets
+      property: cluster
   refreshInterval: 10m
   secretStoreRef:
     kind: SecretStore
