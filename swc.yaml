@@ -7,7 +7,7 @@ spec:
   data:
   - secretKey: secrets
     remoteRef:
-      key: swct-teama/common/capo
+      key: common/capo
   refreshInterval: 10m
   secretStoreRef:
     kind: SecretStore
