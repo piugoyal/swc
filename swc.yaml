@@ -86,24 +86,13 @@ spec:
         diskSize: 50
         volumeType: ceph_ssd
 ---
-apiVersion: external-secrets.io/v1
-kind: SecretStore
+apiVersion: v1
+kind: Secret
 metadata:
-  name: team-secret-store
+  name: sylva-ca.crt
   namespace: swct-teama
-spec:
-  provider:
-    vault:
-      server: "https://vault.vault.svc.cluster.local:8200"
-      path: swct-teama
-      version: v2
-      caProvider:
-        type: Secret
-        name: sylva-ca.crt
-        key: ca.crt
-      auth:
-        kubernetes:
-          mountPath: kubernetes
-          role: swct-teama
-          serviceAccountRef:
-            name: secretstore-access-team-secret-store
+  labels:
+    app.kubernetes.io/name: workload-team-defs
+type: Opaque
+data:
+  ca.crt: dGVzdA==
