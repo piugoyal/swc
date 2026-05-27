@@ -34,6 +34,7 @@ spec:
       replicas: 0
   sylvaUnitsReleasePresets:
   - default
+  - team--foo
   valuesFrom:
   - type: ExternalSecret
     name: sylva-secret
