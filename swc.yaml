@@ -15,3 +15,106 @@ spec:
     name: team-secret-store
   target:
     name: sylva-secret
+---
+apiVersion: workloadclusteroperator.sylva/v1alpha1
+kind: SylvaWorkloadCluster
+metadata:
+  name: foo
+  namespace: swct-teama
+spec:
+  k8sVersion: "1.35"
+  sylvaSourceVersion:
+    branch: main
+  infrastructure: metal3
+  controlPlane:
+    provider: kubeadm
+    replicas: 1
+  machineDeployments:
+    md1:
+      replicas: 0
+  sylvaUnitsReleasePresets:
+  - default
+  valuesFrom:
+  - type: ExternalSecret
+    name: sylva-secret
+    valuesKey: secrets
+  overridingValues:
+    metal3:
+      bootstrap_ip: 10.177.129.138"
+    cluster_virtual_ip: 10.188.36.149
+    proxies:
+      http_proxy: "http://proxy.rd.francetelecom.fr:8080"
+      https_proxy: "http://proxy.rd.francetelecom.fr:8080"
+      no_proxy: "127.0.0.0/8,localhost,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.sylva"
+    registry_mirrors:
+      default_settings:
+        skip_verify: true
+        override_path: true
+      hosts_config:
+        docker.io:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_docker.io
+        quay.io:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_quay.io
+        registry.gitlab.com:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_registry.gitlab.com
+        ghcr.io:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_ghcr.io
+        registry.k8s.io:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_registry.k8s.io
+        gcr.io:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_gcr.io
+        registry.suse.com:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_registry.suse.com
+        registry.opensuse.org:
+          - mirror_url: https://172.20.136.39/v2/proxy_cache_registry.opensuse.org
+    oci_registry_insecure: true
+  clusterSettings:
+    capm3:
+      os_image_selector:
+        os: ubuntu
+        hardened: true
+      networks:
+        primary:
+          subnet: 10.188.36.128/26
+          gateway: 10.188.36.129
+          start: 10.188.36.148
+          end: 10.188.36.148
+      dns_servers:
+      - 1.2.3.4
+      - 8.8.8.8
+    rke2:
+      additionalUserData:
+        config:
+        #cloud-config
+          users:
+            - name: sylva-user
+              groups: users,sylva-ops
+              sudo: ALL=(ALL) NOPASSWD:ALL
+              shell: /bin/bash
+              lock_passwd: false
+              passwd: "put your password hash here"  # (copy pasted from /etc/shadow or created with "mkpasswd --method=SHA-512 --stdin")
+              ssh_authorized_keys:
+                - ssh-rsa AAAA...... YOUR KEY HERE ....UqnQ==
+  control_plane:  # tweak network configuration as needed
+
+    capm3:
+      hostSelector:  # criteria for matching labels on BareMetalHost objects defined by baremetal_hosts value
+        matchLabels:
+          cluster-role: control-plane
+      networks:
+        primary:
+          interface: bond0.13
+
+    network_interfaces:
+      # for CAPM3 following are used and mapped to Metal3Data.spec.template.spec.networkData.links
+      bond0:
+        type: bond
+        interfaces:
+          - ens1f0
+          - ens1f1
+        vlans:
+          - id: 13
+      ens1f0:
+        type: phy
+      ens1f1:
+        type: phy
