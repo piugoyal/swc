@@ -15,17 +15,18 @@ spec:
     name: team-secret-store
   target:
     name: sylva-secret
+
 ---
 apiVersion: workloadclusteroperator.sylva/v1alpha1
 kind: SylvaWorkloadCluster
 metadata:
-  name: foo
+  name: wc1
   namespace: swct-teama
 spec:
-  k8sVersion: "1.35"
+  k8sVersion: "1.34"
   sylvaSourceVersion:
     branch: main
-  infrastructure: metal3
+  infrastructure: openstack
   controlPlane:
     provider: kubeadm
     replicas: 1
@@ -34,15 +35,20 @@ spec:
       replicas: 0
   sylvaUnitsReleasePresets:
   - default
-  - team--foo
   valuesFrom:
   - type: ExternalSecret
     name: sylva-secret
     valuesKey: secrets
   overridingValues:
-    metal3:
-      bootstrap_ip: 10.177.129.138"
-    cluster_virtual_ip: 10.188.36.149
+    security:
+      os_images:
+        skip_signing_check: true
+      oci_artifacts:
+        skip_signing_check: true
+    openstack:
+      storageClass:
+        name: "cinder-ceph-ssd"
+        type: "ceph_ssd"
     proxies:
       http_proxy: "http://proxy.rd.francetelecom.fr:8080"
       https_proxy: "http://proxy.rd.francetelecom.fr:8080"
@@ -70,52 +76,14 @@ spec:
           - mirror_url: https://172.20.136.39/v2/proxy_cache_registry.opensuse.org
     oci_registry_insecure: true
   clusterSettings:
-    capm3:
+    capo:
+      resources_tag: rke2-capo
+      ssh_key_name: sylva-vm
+      network_id: 1f96aab6-280f-4cf8-833f-8dac8fb9313b
       os_image_selector:
         os: ubuntu
         hardened: true
-      networks:
-        primary:
-          subnet: 10.188.36.128/26
-          gateway: 10.188.36.129
-          start: 10.188.36.148
-          end: 10.188.36.148
-      dns_servers:
-      - 1.2.3.4
-      - 8.8.8.8
-    rke2:
-      additionalUserData:
-        config:
-        #cloud-config
-          users:
-            - name: sylva-user
-              groups: users,sylva-ops
-              sudo: ALL=(ALL) NOPASSWD:ALL
-              shell: /bin/bash
-              lock_passwd: false
-              passwd: "put your password hash here"  # (copy pasted from /etc/shadow or created with "mkpasswd --method=SHA-512 --stdin")
-              ssh_authorized_keys:
-                - ssh-rsa AAAA...... YOUR KEY HERE ....UqnQ==
-  control_plane:  # tweak network configuration as needed
+      rootVolume:
+        diskSize: 50
+        volumeType: ceph_ssd
 
-    capm3:
-      hostSelector:  # criteria for matching labels on BareMetalHost objects defined by baremetal_hosts value
-        matchLabels:
-          cluster-role: control-plane
-      networks:
-        primary:
-          interface: bond0.13
-
-    network_interfaces:
-      # for CAPM3 following are used and mapped to Metal3Data.spec.template.spec.networkData.links
-      bond0:
-        type: bond
-        interfaces:
-          - ens1f0
-          - ens1f1
-        vlans:
-          - id: 13
-      ens1f0:
-        type: phy
-      ens1f1:
-        type: phy
