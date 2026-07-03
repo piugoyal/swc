@@ -20,7 +20,7 @@ apiVersion: workloadclusteroperator.sylva/v1alpha1
 kind: SylvaWorkloadCluster
 metadata:
   name: wc1
-  namespace: abc
+  namespace: Jai
 spec:
   k8sVersion: "1.35"
   sylvaSourceVersion:
