@@ -2,7 +2,7 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: sylva-secret
-  namespace: swct-teama
+  namespace: swct-abc
 spec:
   data:
   - secretKey: secrets
